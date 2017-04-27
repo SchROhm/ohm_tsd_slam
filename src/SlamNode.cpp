@@ -9,9 +9,6 @@
 #include "ThreadMapping.h"
 #include "ThreadGrid.h"
 
-
-
-
 #include "obcore/math/mathbase.h"
 
 

@@ -13,7 +13,7 @@
     <arg name="y_offset" default="0.0" />
     <arg name="yaw_offset" default="0.0" />
 
-    <arg name="map_size" default="11" />
+    <arg name="map_size" default="13" />
     <arg name="cellsize" default="0.025" />
     <arg name="truncation_radius" default="10" />
 
@@ -22,7 +22,7 @@
 
     <arg name="object_inflation_factor" default="1" />
 
-    <arg name="registration_mode" default="3" />
+    <arg name="registration_mode" default="3" />  <!-- Default was 3    ICP = 0 (only),    EXP = 1,  PDF = 2, TSD = 3 -->
     <arg name="icp_iterations" default="30" />
 
     <arg name="reg_trs_max" default="1.0" />
