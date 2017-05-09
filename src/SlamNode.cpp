@@ -56,7 +56,7 @@ SlamNode::SlamNode(void)
   //instanciate representation
   _grid = new obvious::TsdGrid(cellSize, obvious::LAYOUT_32x32, static_cast<obvious::EnumTsdGridLayout>(octaveFactor));  //obvious::LAYOUT_8192x8192
   _grid->setMaxTruncation(truncationRadius * cellSize);
-  unsigned int cellsPerSide = pow(2, octaveFactor);
+  unsigned int cellsPerSide = pow(2, octaveFactor);  //ToDO: Don't use pow
   double sideLength = static_cast<double>(cellsPerSide) * cellSize;
   ROS_INFO_STREAM("Creating representation with " << cellsPerSide << "x" << cellsPerSide << "cells, representating " <<
                   sideLength << "x" << sideLength << "m^2" << std::endl);
