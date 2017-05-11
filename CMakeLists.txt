@@ -17,7 +17,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -fopenmp -O2 -mtune=
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
-
+find_package( PCL REQUIRED )
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -102,13 +102,18 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/src
   $ENV{OBVIOUSLY_ROOT}
+  /usr/include/eigen3
+  ${PCL_INCLUDE_DIRS}
 )
 
 link_directories(
   $ENV{OBVIOUSLY_ROOT}/build/release/obcore
   $ENV{OBVIOUSLY_ROOT}/build/release/obgraphic
   $ENV{OBVIOUSLY_ROOT}/build/release/obvision
+  ${PCL_LIBRARY_DIRS}
 )
+
+add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a cpp library
 # add_library(ohm_tsd_slam
@@ -143,6 +148,7 @@ target_link_libraries(slam_node
                                  ann
                                  flann
                                  ${Boost_LIBRARIES}
+                                 ${PCL_LIBRARIES}
                                  )
 
 #############

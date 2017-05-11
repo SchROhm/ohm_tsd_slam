@@ -24,6 +24,8 @@
 #include "obvision/registration/ransacMatching/RandomNormalMatching.h"
 #include "obvision/registration/ransacMatching/PDFMatching.h"
 #include "obvision/registration/ransacMatching/TSD_PDFMatching.h"
+#include "obvision/registration/ransacMatching/RS_RNM_Matching.h"
+
 
 #include "obgraphic/Obvious2D.h" //debugging tsd_pdf
 #include "obcore/base/tools.h" //debugging tsd_pdf
@@ -32,6 +34,17 @@
 
 #include <string>
 #include <cmath>
+
+//RS DEV AddOns
+#include <sensor_msgs/PointCloud2.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/common/transforms.h>
+#include <pcl/common/common.h>
+#include <pcl/common/angles.h>
+#include <Eigen/Dense>
+
 
 namespace ohm_tsd_slam
 {
@@ -65,7 +78,8 @@ class ThreadLocalize: public ThreadSLAM
     ICP = 0,    ///< Registration with Icp only
     EXP = 1,
     PDF = 2,
-    TSD = 3
+    TSD = 3,
+    RS_RNM = 4
   };
 
 public:
@@ -407,7 +421,7 @@ private:
   obvious::RandomNormalMatching* _RandomNormalMatcher;
   obvious::PDFMatching* _PDFMatcher;
   obvious::TSD_PDFMatching* _TSD_PDFMatcher;
-
+  obvious::RS_RNM_Matching* _RS_RNM_Matching;
   /**
    * Last pose
    */
@@ -417,6 +431,12 @@ private:
    * Ros pose publisher
    */
   ros::Publisher _posePub;
+
+  ros::Publisher _pcPub1; //Only for development
+  ros::Publisher _pcPub2; //Only for development
+
+  pcl::PointCloud<pcl::PointXYZ>  _pcTest1;
+  pcl::PointCloud<pcl::PointXYZ>  _pcTest2;
 
   /**
    * Ros current pose

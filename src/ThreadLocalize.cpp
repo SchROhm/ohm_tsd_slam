@@ -22,6 +22,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <tf/tf.h>
 
+
 //#define TRACE
 
 namespace ohm_tsd_slam
@@ -41,7 +42,8 @@ ThreadLocalize::ThreadLocalize(obvious::TsdGrid* grid, ThreadMapping* mapper, ro
                     _xOffset(xOffset),
                     _yOffset(yOffset),
                     _nameSpace(nameSpace),
-                    _stampLaser(ros::Time::now())
+                    _stampLaser(ros::Time::now()),
+                    _pcTest()
 {
   ros::NodeHandle prvNh("~");
 
@@ -151,6 +153,9 @@ ThreadLocalize::ThreadLocalize(obvious::TsdGrid* grid, ThreadMapping* mapper, ro
   case TSD:
     _TSD_PDFMatcher = new obvious::TSD_PDFMatching(_grid, trials, epsThresh, sizeControlSet, zrand);
     break;
+  case RS_RNM:
+    _RS_RNM_Matching = new obvious::RS_RNM_Matching(_grid, trials, epsThresh, sizeControlSet, zrand);
+    break;
   default:
     ROS_ERROR_STREAM("Unknown registration mode " << _regMode << " use default = ICP" << std::endl);
     break;
@@ -188,6 +193,46 @@ ThreadLocalize::ThreadLocalize(obvious::TsdGrid* grid, ThreadMapping* mapper, ro
   _tf.child_frame_id_          = _nameSpace + _tfChildFrameId;
 
   _reverseScan = false;
+
+  //RS Development AddOns-------------------------------------------------------------------------------------
+  _pcPub1 = nh->advertise<sensor_msgs::PointCloud2>("RS_PC_Dev_1",1); //Buffersize 1;
+  _pcPub1 = nh->advertise<sensor_msgs::PointCloud2>("RS_PC_Dev_1",1); //Buffersize 1;
+  _pcTest1.clear();
+  _pcTest1.push_back(pcl::PointXYZ(0.0,0.0,0.0));
+
+   for(int i = 0; i < 10; i++)
+   {
+     float temp_x = 0.25 * (float)i;
+
+     for(int j = 0; j < 10 ; j++)
+     {
+       float temp_y = 0.25 * (float) j;
+
+       for (int k = 0; k < 10; k++)
+       {
+         float temp_z = 0.25 * (float) k;
+
+         _pcTest1.push_back(pcl::PointXYZ(temp_x,temp_y, temp_z));
+        // ROS_INFO("Werte: X = %f Y= %f Z = %f",temp_x, temp_y, temp_z);
+
+       }
+     }
+   }
+
+   Eigen::Matrix<float,4,4> transformation; // Long for Eigen::Matrix4f
+   Eigen::Matrix4f test;
+
+
+
+
+   pcl::transformPoint(_pcTest1,_pcTest2, transformation); // in, out, trans
+
+
+
+
+
+
+
 }
 
 ThreadLocalize::~ThreadLocalize()
@@ -432,6 +477,13 @@ void ThreadLocalize::eventLoop(void)
 
     T = doRegistration(_sensor, &M, &Mvalid, &N, &Nvalid, &S, &Svalid);  //3x3 Transformation Matrix
 
+    //RS my test
+    sensor_msgs::PointCloud2 msg_temp;
+    pcl::toROSMsg(_pcTest,msg_temp);
+    msg_temp.header.frame_id = "map";
+
+    _pcPub1.publish(msg_temp);
+
     /** analyze registration result */
     _tf.stamp_ = ros::Time::now();
     const bool regErrorT = isRegistrationError(&T, _trnsMax, _rotMax);
@@ -560,6 +612,16 @@ obvious::Matrix ThreadLocalize::doRegistration(obvious::SensorPolar2D* sensor,
   case TSD:
     // todo: check normals N for matching function (Daniel Ammon, Tobias Fink)
     T = _TSD_PDFMatcher->match(sensor->getTransformation(), M, _maskM, NULL, S, _maskS, obvious::deg2rad(_ranPhiMax), _trnsMax, sensor->getAngularResolution());
+    T44(0, 0) = T(0, 0);
+    T44(0, 1) = T(0, 1);
+    T44(0, 3) = T(0, 2);
+    T44(1, 0) = T(1, 0);
+    T44(1, 1) = T(1, 1);
+    T44(1, 3) = T(1, 2);
+    break;
+  case RS_RNM:
+    // todo: check normals N for matching function (Daniel Ammon, Tobias Fink)
+    T = _RS_RNM_Matching->match(sensor->getTransformation(), M, _maskM, NULL, S, _maskS, obvious::deg2rad(_ranPhiMax), _trnsMax, sensor->getAngularResolution());
     T44(0, 0) = T(0, 0);
     T44(0, 1) = T(0, 1);
     T44(0, 3) = T(0, 2);
