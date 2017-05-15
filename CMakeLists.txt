@@ -102,9 +102,9 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/src
   $ENV{OBVIOUSLY_ROOT}
-  $ENV{MY_WORK}
   /usr/include/eigen3
   ${PCL_INCLUDE_DIRS}
+  $ENV{MY_WORK}
 )
 
 link_directories(
@@ -123,12 +123,13 @@ add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a cpp executable
 add_executable(slam_node src/slam_node.cpp
-                                 src/SlamNode.cpp
-                                 src/ThreadLocalize.cpp
-                                 src/ThreadSLAM.cpp
-                                 src/ThreadMapping.cpp
-                                 src/ThreadGrid.cpp
-                                 )
+                         src/SlamNode.cpp
+                         src/ThreadLocalize.cpp
+                         src/ThreadSLAM.cpp
+                         src/ThreadMapping.cpp
+                         src/ThreadGrid.cpp
+                         $ENV{MY_WORK}/Transform.cpp
+                         )
 
                                   
 ## Add cmake target dependencies of the executable/library

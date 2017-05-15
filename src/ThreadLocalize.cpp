@@ -221,14 +221,20 @@ ThreadLocalize::ThreadLocalize(obvious::TsdGrid* grid, ThreadMapping* mapper, ro
    }
 
    Eigen::Matrix<float,4,4> transformation = Eigen::Matrix4f::Identity(); // Long for Eigen::Matrix4f
-   transformation = rs::Transform::getTFMatrix(0.0,0.0,0.0,0.0,0.0,0.0);
+
+  // rs::Transform test123;
+
+  // test123.test123 = 15;
+
+   transformation = rs::Transform::getTFMatrix(       1.5,  //X
+                                               0.0,  //Y
+                                               1.5,  //Z
+                                               0.0,  //Roll
+                                               1.0,  //Pitch
+                                               0.0); //Yaw
 
 
-
-
-
-
-   pcl::transformPoint(_pcTest1,_pcTest2, transformation); // in, out, trans
+   pcl::transformPointCloud(_pcTest1,_pcTest2, transformation); // in, out, trans
 
 
 
@@ -412,6 +418,8 @@ obvious::Matrix ThreadLocalize::tfToObviouslyMatrix3x3(const tf::Transform& tf)
 
 void ThreadLocalize::eventLoop(void)
 {
+  static bool temp_test = false;
+
   _sleepCond.wait(_sleepMutex);
   while(_stayActive)
   {
@@ -482,10 +490,29 @@ void ThreadLocalize::eventLoop(void)
 
     //RS my test
     sensor_msgs::PointCloud2 msg_temp;
-    pcl::toROSMsg(_pcTest1,msg_temp);
+
+    if(temp_test)
+    {
+      pcl::toROSMsg(_pcTest2,msg_temp);
+      temp_test = false;
+    }
+    else
+    {
+      pcl::toROSMsg(_pcTest1,msg_temp);
+      temp_test = true;
+    }
+
+
+
+
     msg_temp.header.frame_id = "map";
 
     _pcPub1.publish(msg_temp);
+
+
+
+
+
 
     /** analyze registration result */
     _tf.stamp_ = ros::Time::now();
