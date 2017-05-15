@@ -102,6 +102,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/src
   $ENV{OBVIOUSLY_ROOT}
+  $ENV{MY_WORK}
   /usr/include/eigen3
   ${PCL_INCLUDE_DIRS}
 )

@@ -43,7 +43,8 @@ ThreadLocalize::ThreadLocalize(obvious::TsdGrid* grid, ThreadMapping* mapper, ro
                     _yOffset(yOffset),
                     _nameSpace(nameSpace),
                     _stampLaser(ros::Time::now()),
-                    _pcTest()
+                    _pcTest1(),
+                    _pcTest2()
 {
   ros::NodeHandle prvNh("~");
 
@@ -219,8 +220,8 @@ ThreadLocalize::ThreadLocalize(obvious::TsdGrid* grid, ThreadMapping* mapper, ro
      }
    }
 
-   Eigen::Matrix<float,4,4> transformation; // Long for Eigen::Matrix4f
-   Eigen::Matrix4f test;
+   Eigen::Matrix<float,4,4> transformation = Eigen::Matrix4f::Identity(); // Long for Eigen::Matrix4f
+
 
 
 
@@ -479,7 +480,7 @@ void ThreadLocalize::eventLoop(void)
 
     //RS my test
     sensor_msgs::PointCloud2 msg_temp;
-    pcl::toROSMsg(_pcTest,msg_temp);
+    pcl::toROSMsg(_pcTest1,msg_temp);
     msg_temp.header.frame_id = "map";
 
     _pcPub1.publish(msg_temp);

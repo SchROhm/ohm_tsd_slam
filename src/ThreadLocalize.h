@@ -45,6 +45,8 @@
 #include <pcl/common/angles.h>
 #include <Eigen/Dense>
 
+#include <Transform.h>
+
 
 namespace ohm_tsd_slam
 {
