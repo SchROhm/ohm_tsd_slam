@@ -221,6 +221,8 @@ ThreadLocalize::ThreadLocalize(obvious::TsdGrid* grid, ThreadMapping* mapper, ro
    }
 
    Eigen::Matrix<float,4,4> transformation = Eigen::Matrix4f::Identity(); // Long for Eigen::Matrix4f
+   transformation = rs::Transform::getTFMatrix(0.0,0.0,0.0,0.0,0.0,0.0);
+
 
 
 
