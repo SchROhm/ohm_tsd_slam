@@ -438,7 +438,7 @@ private:
   ros::Publisher _pcPub2; //Only for development
 
   pcl::PointCloud<pcl::PointXYZ>  _pcTest1;
-  pcl::PointCloud<pcl::PointXYZ>  _pcTest2;
+  pcl::PointCloud<pcl::PointXYZ>*  _pcTest2;
 
   /**
    * Ros current pose

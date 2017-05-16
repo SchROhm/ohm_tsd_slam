@@ -197,7 +197,8 @@ ThreadLocalize::ThreadLocalize(obvious::TsdGrid* grid, ThreadMapping* mapper, ro
 
   //RS Development AddOns-------------------------------------------------------------------------------------
   _pcPub1 = nh->advertise<sensor_msgs::PointCloud2>("RS_PC_Dev_1",1); //Buffersize 1;
-  _pcPub1 = nh->advertise<sensor_msgs::PointCloud2>("RS_PC_Dev_1",1); //Buffersize 1;
+  _pcPub2 = nh->advertise<sensor_msgs::PointCloud2>("RS_PC_Dev_2",1); //Buffersize 1;
+
   _pcTest1.clear();
   _pcTest1.push_back(pcl::PointXYZ(0.0,0.0,0.0));
 
@@ -220,22 +221,22 @@ ThreadLocalize::ThreadLocalize(obvious::TsdGrid* grid, ThreadMapping* mapper, ro
      }
    }
 
+   _pcTest2 = new pcl::PointCloud<pcl::PointXYZ>(_pcTest1);
+
    Eigen::Matrix<float,4,4> transformation = Eigen::Matrix4f::Identity(); // Long for Eigen::Matrix4f
 
-  // rs::Transform test123;
-
-  // test123.test123 = 15;
-
-   transformation = rs::Transform::getTFMatrix(       1.5,  //X
+   transformation = rs::Transform::getTFMatrix(1.5,  //X
                                                0.0,  //Y
                                                1.5,  //Z
                                                0.0,  //Roll
                                                1.0,  //Pitch
                                                0.0); //Yaw
 
+   if(transformation.isIdentity()) ROS_ERROR("Error: Transformation Matrix is an Identity matrix");
+   else ROS_INFO("Transformation matrix is normal");
 
-   pcl::transformPointCloud(_pcTest1,_pcTest2, transformation); // in, out, trans
 
+   pcl::transformPointCloud(_pcTest1,*_pcTest2, transformation); // in, out, trans
 
 
 
@@ -418,7 +419,6 @@ obvious::Matrix ThreadLocalize::tfToObviouslyMatrix3x3(const tf::Transform& tf)
 
 void ThreadLocalize::eventLoop(void)
 {
-  static bool temp_test = false;
 
   _sleepCond.wait(_sleepMutex);
   while(_stayActive)
@@ -489,25 +489,16 @@ void ThreadLocalize::eventLoop(void)
     T = doRegistration(_sensor, &M, &Mvalid, &N, &Nvalid, &S, &Svalid);  //3x3 Transformation Matrix
 
     //RS my test
-    sensor_msgs::PointCloud2 msg_temp;
+    sensor_msgs::PointCloud2 msg_temp1;
+    pcl::toROSMsg(_pcTest1,msg_temp1);
+    msg_temp1.header.frame_id = "map";
+    _pcPub1.publish(msg_temp1);
 
-    if(temp_test)
-    {
-      pcl::toROSMsg(_pcTest2,msg_temp);
-      temp_test = false;
-    }
-    else
-    {
-      pcl::toROSMsg(_pcTest1,msg_temp);
-      temp_test = true;
-    }
+    sensor_msgs::PointCloud2 msg_temp2;
+    pcl::toROSMsg(*_pcTest2,msg_temp2);
+    msg_temp2.header.frame_id = "map";
+    _pcPub2.publish(msg_temp2);
 
-
-
-
-    msg_temp.header.frame_id = "map";
-
-    _pcPub1.publish(msg_temp);
 
 
 
